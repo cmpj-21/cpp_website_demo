@@ -92,8 +92,7 @@ int main() {
     std::string responseBody;
 
     if (request.find("GET /hello") != std::string::npos) {
-      responseBody = "{\"message\": \"Hello Cj! This is now a cross-platform "
-                     "C++ server!\"}";
+      responseBody = "{\"message\": \"Hello World! From C++!\"}";
     } else {
       responseBody = "{\"error\": \"Not found\"}";
     }

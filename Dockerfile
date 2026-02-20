@@ -16,6 +16,9 @@ RUN g++ -o server main.cpp
 # Final Stage
 FROM alpine:latest
 
+# Install runtime dependencies for C++
+RUN apk add --no-cache libstdc++ libgcc
+
 # Set working directory
 WORKDIR /app
 
