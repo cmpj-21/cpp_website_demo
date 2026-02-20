@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>C++ Backend Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cpp-blue: #00b4d8;
+      --cpp-dark-blue: #0077b6;
+      --cpp-accent: #90e0ef;
+      --bg: #050a0f;
+      --bg2: #0a1520;
+      --card: #0d1b2a;
+      --border: #1a3a5c;
+      --text: #caf0f8;
+      --muted: #4a7fa5;
+      --display: 'Orbitron', sans-serif;
+      --mono: 'Courier Prime', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Scanline effect */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 180, 216, 0.015) 2px,
+        rgba(0, 180, 216, 0.015) 4px
+      );
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Glow orb */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -150px; right: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,180,216,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .cpp-logo {
+      width: 48px; height: 48px;
+      background: var(--cpp-blue);
+      color: var(--bg);
+      font-family: var(--display);
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      flex-shrink: 0;
+    }
+
+    .header-text {}
+
+    .tag-line {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--cpp-blue);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(30px, 7vw, 48px);
+      font-weight: 900;
+      letter-spacing: 2px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    h1 span { color: var(--cpp-blue); }
+
+    .subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      font-style: italic;
+      margin-bottom: 32px;
+      margin-top: 6px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 26px;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0,180,216,0.05), inset 0 0 30px rgba(0,180,216,0.02);
+    }
+
+    /* Top glow line */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cpp-blue), transparent);
+    }
+
+    .compile-block {
+      background: #020a10;
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      margin-bottom: 22px;
+      font-size: 12px;
+      line-height: 1.8;
+      position: relative;
+    }
+
+    .compile-block::before {
+      content: 'COMPILE & RUN';
+      position: absolute;
+      top: -8px; left: 12px;
+      background: var(--card);
+      padding: 0 6px;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--muted);
+    }
+
+    .compile-block .prompt { color: var(--cpp-blue); }
+    .compile-block .cmd { color: #e0e0e0; }
+    .compile-block .comment { color: #2a5a7a; font-style: italic; }
+
+    .endpoint-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .method {
+      background: var(--cpp-blue);
+      color: var(--bg);
+      font-family: var(--display);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      flex-shrink: 0;
+    }
+
+    .url {
+      font-size: 12px;
+      color: var(--cpp-accent);
+      letter-spacing: 1px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: transparent;
+      color: var(--cpp-blue);
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      border: 1px solid var(--cpp-blue);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--cpp-blue);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s ease;
+      z-index: 0;
+    }
+
+    .btn span {
+      position: relative;
+      z-index: 1;
+      transition: color 0.25s ease;
+    }
+
+    .btn:hover::before { transform: scaleX(1); }
+    .btn:hover span { color: var(--bg); }
+    .btn:active { opacity: 0.8; }
+    .btn.loading { opacity: 0.5; cursor: not-allowed; }
+
+    .output-area {
+      margin-top: 18px;
+      min-height: 52px;
+    }
+
+    .response {
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.3s ease;
+      font-size: 13px;
+      padding: 12px 14px;
+      border-left: 2px solid transparent;
+      background: rgba(0,180,216,0.03);
+    }
+
+    .response.visible { opacity: 1; transform: translateY(0); }
+    .response.success { border-color: var(--cpp-blue); color: var(--cpp-accent); }
+    .response.error { border-color: #e05c5c; color: #ff6b6b; }
+
+    .response .label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .status-bar {
+      margin-top: 22px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-row">
+      <div class="cpp-logo">C++</div>
+      <div class="header-text">
+        <div class="tag-line">Backend Demo</div>
+        <h1>NATIVE <span>SERVER</span></h1>
+      </div>
+    </div>
+
+    <p class="subtitle">localhost:8083 · raw winsock · no framework</p>
+
+    <div class="card">
+      <div class="compile-block">
+        <span class="comment">// compile first</span><br>
+        <span class="prompt">$ </span><span class="cmd">g++ -o server main.cpp -lws2_32</span><br>
+        <span class="comment">// then run</span><br>
+        <span class="prompt">$ </span><span class="cmd">server.exe</span>
+      </div>
+
+      <div class="endpoint-row">
+        <span class="method">GET</span>
+        <span class="url">http://localhost:8083/hello</span>
+      </div>
+
+      <button class="btn" id="greetBtn" onclick="greet()">
+        <span id="btnText">EXECUTE REQUEST</span>
+      </button>
+
+      <div class="output-area">
+        <div class="response" id="response">
+          <span class="label">// stdout</span>
+          <span id="responseText"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span>C++ · Winsock2 · Windows</span>
+      <span>port 8083</span>
+    </div>
+  </div>
+
+  <script>
+    async function greet() {
+      const btn = document.getElementById('greetBtn');
+      const btnText = document.getElementById('btnText');
+      const response = document.getElementById('response');
+      const responseText = document.getElementById('responseText');
+
+      btn.classList.add('loading');
+      btnText.textContent = 'CONNECTING...';
+      response.classList.remove('visible', 'success', 'error');
+
+      try {
+        const res = await fetch('http://localhost:8083/hello');
+        const data = await res.json();
+
+        responseText.textContent = data.message;
+        response.classList.add('visible', 'success');
+      } catch (err) {
+        responseText.textContent = 'Could not connect. Is the C++ server compiled and running?';
+        response.classList.add('visible', 'error');
+      } finally {
+        btn.classList.remove('loading');
+        btnText.textContent = 'EXECUTE REQUEST';
+      }
+    }
+  </script>
+</body>
+</html>
